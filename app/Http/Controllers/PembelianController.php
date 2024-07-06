@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Pembelian;
 use App\Models\Checkout;
 use App\Models\Product;
+use App\Models\History;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth; // Import Facade untuk Auth
+use Illuminate\Support\Facades\Log;
 
 class PembelianController extends Controller
 {
@@ -152,10 +154,10 @@ class PembelianController extends Controller
         foreach ($checkouts as $checkout) {
             // Ambil produk dari checkout
             $product = $checkout->product; // Pastikan relasi product sudah didefinisikan di model Checkout
-
+            
             // Hitung total harga pembelian
             $total = $checkout->quantity * $product->price + 20000;
-
+            
             // Simpan data pembelian ke dalam tabel Pembelian
             $pembelian = new Pembelian();
             $pembelian->user_id = $userId;
@@ -169,6 +171,15 @@ class PembelianController extends Controller
 
             // Simpan data pembelian ke dalam database
             $pembelian->save();
+
+            //Simpan data ke tabel history
+            $history = new History();
+            $history->user_id = $userId;
+            $history->product_id = $checkout->product_id;
+            $history->checkout_id = $checkout->id;
+            $history->price = $total;
+            // dd($history);
+            $history->save();
         }
 
         // Optional: Hapus semua checkout setelah berhasil disimpan ke dalam pembelian
@@ -176,6 +187,35 @@ class PembelianController extends Controller
 
         // Redirect atau kembalikan response sesuai kebutuhan
         return redirect()->route('paymentBill')->with('success', 'Pembelian berhasil diproses!');
+    }
+
+    public function getUserHistory()
+    {
+        $userId = Auth::id();
+           
+        $history = History::where('user_id', $userId)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // dd($history);
+        return view('user.history', ['histories' => $history]);
+    }
+
+    public function salesReport()
+    {
+        // Ambil semua data penjualan dari tabel history dan urutkan berdasarkan tanggal
+        $sales = History::orderBy('created_at', 'desc')->get();
+
+        // Kirim data penjualan ke view
+        return view('superadmin.salesReport', ['sales' => $sales]);
+    }
+    public function salesReportAdmin()
+    {
+        // Ambil semua data penjualan dari tabel history dan urutkan berdasarkan tanggal
+        $sales = History::orderBy('created_at', 'desc')->get();
+
+        // Kirim data penjualan ke view
+        return view('admin.salesReport', ['sales' => $sales]);
     }
 
     public function checkout(Request $request)

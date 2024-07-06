@@ -25,6 +25,7 @@ Route::middleware(['auth', 'user-access:superadmin'])->group(function () {
     Route::get('/manage-product', [ProductController::class, 'superadminProduct'])->name('superadminProduct');
     Route::get('/manage-product/create', [ProductController::class, 'superadminProductCreate'])->name('superadminProductCreate');
     Route::get('/manage-product/edit/{user}', [ProductController::class, 'superadminProductEdit'])->name('superadminProductEdit');
+    Route::get('/sales-report', [PembelianController::class, 'salesReport'])->name('superadmin.salesReport');
 });
 
 Route::middleware(['auth', 'user-access:admin'])->group(function () {
@@ -32,6 +33,7 @@ Route::middleware(['auth', 'user-access:admin'])->group(function () {
     Route::get('/admin/manage-product', [ProductController::class, 'adminProduct'])->name('adminProduct');
     Route::get('/admin/manage-product/create', [ProductController::class, 'adminProductCreate'])->name('adminProductCreate');
     Route::get('/admin/manage-product/edit/{user}', [ProductController::class, 'adminProductEdit'])->name('adminProductEdit');
+    Route::get('/admin/sales-report', [PembelianController::class, 'salesReportAdmin'])->name('admin.salesReport');
 });
 
 Route::middleware(['auth', 'user-access:user'])->group(function () {
@@ -44,6 +46,5 @@ Route::middleware(['auth', 'user-access:user'])->group(function () {
     Route::get('/user/payment', [PembelianController::class, 'paymentUser'])->name('userPayment');
     Route::post('/user/payment/process', [PembelianController::class, 'paymentProcess'])->name('paymentProcess');
     Route::get('/user/payment/bill', [PembelianController::class, 'paymentBill'])->name('paymentBill');
+    Route::get('/user/history/{id}', [PembelianController::class, 'getUserHistory'])->name('user.history');
 });
-
-

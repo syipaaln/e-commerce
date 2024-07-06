@@ -17,8 +17,8 @@ return new class extends Migration
             $table->unsignedBigInteger('product_id');
             $table->timestamps();
             $table->integer('quantity');
-            $table->foreign('user_id');
-            $table->foreign('product_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
         });
     }
 
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('checkouts');
     }
 };
